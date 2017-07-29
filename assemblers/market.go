@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
-	"github.com/regner/albionmarket-client/utils"
+	"./utils"
 	"reflect"
 	"regexp"
 	"strings"

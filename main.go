@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
-	"github.com/regner/albionmarket-client/assemblers"
-	"github.com/regner/albionmarket-client/utils"
+	"./assemblers"
+	"./utils"
 )
 
 func main() {
