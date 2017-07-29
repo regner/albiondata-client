@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
-	"github.com/regner/albionmarket-client/assemblers"
-	"github.com/regner/albionmarket-client/utils"
+	"./assemblers"
+	"./utils"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	if config.SaveLocally {
 		log.Print("Saving market orders locally.")
 	}
-	
+
 	devices, err := pcap.FindAllDevs()
 
 	if err != nil {
@@ -53,14 +53,18 @@ func captureDeviceTraffic(deviceName string, config utils.ClientConfig, wg sync.
 	defer wg.Done()
 
 	handle, err := pcap.OpenLive(deviceName, 2048, false, pcap.BlockForever)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer handle.Close()
 
-	var filter = "udp"
+	var filter = `
+		src 192.168.2.15 &&
+		dst 158.85.26.40`
 	err = handle.SetBPFFilter(filter)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,3 +79,13 @@ func captureDeviceTraffic(deviceName string, config utils.ClientConfig, wg sync.
 		assembler.ProcessPacket(packet)
 	}
 }
+
+// (udp.port == 54332 || udp.port == 61621) && ip.src == 192.168.2.15 && ip.dst == 158.85.26.40 && udp.length == 142
+// (udp.port == 54332 || udp.port == 61621) && ip.src == 192.168.2.15 && ip.dst == 158.85.26.40 && udp.length == 108
+// udp port 61621 && src 192.168.2.15 && dst == 158.85.26.40 && less 142 && greater 142
+// (udp.port == 54332 || udp.port == 61621) && ip.src == 192.168.2.15 && ip.dst == 158.85.26.40 && (udp.length == 116 || udp.length == 148 || udp.length == 104)
+// pine
+// iron
+// sandstone
+// (udp.port == 54332 || udp.port == 61621) && ip.src == 192.168.2.15 && ip.dst == 158.85.26.40 && (udp.length == 116 || udp.length == 148 || udp.length == 104)
+// 34433, 1

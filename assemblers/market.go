@@ -4,10 +4,11 @@ import (
 	"encoding/binary"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
-	"github.com/regner/albionmarket-client/utils"
+	"../utils"
 	"reflect"
 	"regexp"
 	"strings"
+	"log"
 )
 
 /*
@@ -51,6 +52,33 @@ func (ma *MarketAssembler) ProcessPacket(packet gopacket.Packet) {
 
 		if len(udp.Payload) < 56 {
 			return
+		}
+
+		var tmp_user_id = int(binary.BigEndian.Uint16(udp.Payload[0:2]))
+		var message_type = int(binary.BigEndian.Uint16(udp.Payload[2:4]))
+		var unknown = int(binary.BigEndian.Uint32(udp.Payload[4:8]))
+		var packet_id = int(binary.BigEndian.Uint16(udp.Payload[22:24]))
+
+		log.Printf("[%d] %d, %d, %d", message_type, tmp_user_id, packet_id, unknown)
+
+		if message_type == 1 {
+			log.Print("Moving / market??")
+			var item_id = int(udp.Payload[19])
+			var item_name = "UNKNOWN"
+			if item_id == 128 {
+				item_name = "Iron"
+			} else if item_id == 84 {
+				item_name = "Chestnut"
+			} else if item_id == 96 {
+				item_name = "Pine"
+			}
+			log.Printf("Requesting %s: %d, %d", item_name, packet_id, unknown)
+		} else if message_type == 2 {
+			log.Print("Selling")
+		} else if message_type == 3 {
+			log.Print("sell order screen?")
+		} else {
+			log.Printf("unknown message %d, %d, %d", tmp_user_id, message_type, unknown)
 		}
 
 		morePackets := udp.Payload[19]
