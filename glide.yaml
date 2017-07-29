@@ -4,7 +4,3 @@ import:
   subpackages:
   - layers
   - pcap
-- package: github.com/regner/albionmarket-client
-  subpackages:
-  - assemblers
-  - utils
