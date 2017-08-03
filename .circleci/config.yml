@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/regner/albionmarket-client
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - checkout
+      - run: make validate-fmt
