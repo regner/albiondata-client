@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 IFS=$'\n'
 badFiles=($(goimports -l $(go list -f {{.Dir}} ./... | grep -v /vendor/)))
 unset IFS
