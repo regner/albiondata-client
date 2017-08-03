@@ -6,4 +6,5 @@ jobs:
       - image: circleci/golang:1.8
     steps:
       - checkout
+      - run: go get golang.org/x/tools/cmd/goimports
       - run: make validate-fmt
