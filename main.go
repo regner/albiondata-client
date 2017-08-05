@@ -16,6 +16,7 @@ import (
 )
 
 var onOperationSend chan interface{} = make(chan interface{})
+var onOperationReply chan interface{} = make(chan interface{})
 
 func main() {
 	log.Print("Starting the Albion Market Client...")
@@ -30,6 +31,7 @@ func main() {
 	}
 
 	go processOperations()
+	go processOperationReplies()
 	go watchProcesses()
 
 	for {
@@ -148,16 +150,31 @@ func listenToSource(source *gopacket.PacketSource, quit chan bool) {
 func onReliableCommand(command *photon.PhotonCommand) {
 	msg, _ := command.ReliableMessage()
 	params, _ := photon.DecodeReliableMessage(msg)
-	operation := operations.Decode(params)
 
-	if operation != nil {
-		onOperationSend <- operation
+	switch msg.Type {
+		case photon.OperationRequest:
+			op := operations.DecodeRequest(params)
+			if op != nil {
+				onOperationSend <- op
+			}
+		case photon.OperationResponse:
+			op := operations.DecodeResponse(params)
+			if op != nil {
+				onOperationReply <- op
+			}
 	}
 }
 
 func processOperations() {
 	for {
-		v := <-onOperationSend
-		log.Print("Operation received", v)
+		v := <- onOperationSend
+		log.Print("Operation: ", v)
+	}
+}
+
+func processOperationReplies() {
+	for {
+		v := <- onOperationReply
+		log.Print("Operation Reply: ", v)
 	}
 }
