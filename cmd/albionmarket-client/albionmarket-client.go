@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"github.com/regner/albionmarket-client/client"
-	"github.com/regner/albionmarket-client/utils"
 )
 
 var (
@@ -53,8 +52,6 @@ func main() {
 	if options.OfflinePath != "" {
 		options.Offline = true
 	}
-
-	utils.NewUnhandledPktDumper()
 
 	c := client.NewClient(options)
 	c.Run()

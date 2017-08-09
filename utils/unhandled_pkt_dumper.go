@@ -7,6 +7,8 @@ import (
 	"strconv"
 )
 
+var UnhandledPacketDumper UnhandledPktDumper = *NewUnhandledPktDumper()
+
 const dumpFileName string = "pktDump.go"
 const fileHeader string = `package main
 
@@ -24,6 +26,20 @@ type packetDumpContainer struct {
 type packetDumpStorage struct {
 	FileHeader string
 	PacketStrings []packetDumpContainer
+}
+
+type UPDstringParams struct {
+	parameters []string
+}
+
+func (params *UPDstringParams) AddParam(paramID uint8, paramType string) {
+	var fieldName string = "Unknown" + strconv.Itoa(int(paramID))
+	if paramID == 253 {
+		fieldName = "Opcode"
+	}
+	var tmp string = fieldName + " " + paramType + "\t\u0060mapstructure:\"" + strconv.Itoa(int(paramID)) + "\"\u0060"
+	params.parameters = append(params.parameters, tmp)
+	println(tmp)
 }
 
 type UnhandledPktDumper struct {
@@ -102,4 +118,18 @@ func (dumper *UnhandledPktDumper) extractPackets(data *string) (*packetDumpStora
 	}
 
 	return &pss, nil
+}
+
+func (dumper *UnhandledPktDumper) DumpExists(opcode int16) (bool) {
+	for _, element := range dumper.DumpedPackets.PacketStrings {
+		if (element.Opcode == opcode) {
+			return  true
+		}
+	}
+
+	return false
+}
+
+func (dumper *UnhandledPktDumper) AddPacket(params *UPDstringParams) (*packetDumpStorage, error) {
+	return nil, nil
 }
