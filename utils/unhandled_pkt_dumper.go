@@ -33,11 +33,10 @@ type UPDstringParams struct {
 }
 
 func (params *UPDstringParams) AddParam(paramID uint8, paramType string) {
-	var fieldName string = "Unknown" + strconv.Itoa(int(paramID))
 	if paramID == 253 {
-		fieldName = "Opcode"
+		return
 	}
-	var tmp string = fieldName + " " + paramType + "\t\u0060mapstructure:\"" + strconv.Itoa(int(paramID)) + "\"\u0060"
+	var tmp string = "Unknown" + strconv.Itoa(int(paramID)) + " " + paramType + "\t\u0060mapstructure:\"" + strconv.Itoa(int(paramID)) + "\"\u0060"
 	params.parameters = append(params.parameters, tmp)
 	println(tmp)
 }
