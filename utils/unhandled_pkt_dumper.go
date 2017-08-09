@@ -51,6 +51,7 @@ func (params *UPDstringParams) AddParam(paramID uint8, paramType string) {
 }
 
 func (dumper *UnhandledPktDumper) loadDumpedPacketOpcodesFromFile() {
+	//TODO: Insert start param check to stop it from reading/writing to file.
 	// try to open dumpfile
 	data, err := ioutil.ReadFile(dumpFileName)
 	if err != nil { // we failed, the file did not exist, so create it
