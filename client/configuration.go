@@ -6,4 +6,5 @@ type Config struct {
 	SaveLocally   bool
 	OfflinePath   string
 	Offline       bool
+	DumpUnknown		bool
 }

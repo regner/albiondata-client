@@ -38,6 +38,13 @@ func init() {
 		"",
 		"Parses a local file instead of checking albion ports",
 	)
+
+	flag.BoolVar(
+		&options.DumpUnknown,
+		"u",
+		false,
+		"If specified all unknown packets get stored locally inside the pktDump.go file.",
+	)
 }
 
 func main() {
