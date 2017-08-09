@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
+	"os"
 )
 
 var UnhandledPacketDumper UnhandledPktDumper = *NewUnhandledPktDumper()
@@ -25,20 +26,12 @@ type packetDumpContainer struct {
 
 type packetDumpStorage struct {
 	FileHeader string
-	PacketStrings []packetDumpContainer
+	DumpContainers []packetDumpContainer
 }
 
 type UPDstringParams struct {
+	Opcode int16
 	parameters []string
-}
-
-func (params *UPDstringParams) AddParam(paramID uint8, paramType string) {
-	if paramID == 253 {
-		return
-	}
-	var tmp string = "Unknown" + strconv.Itoa(int(paramID)) + " " + paramType + "\t\u0060mapstructure:\"" + strconv.Itoa(int(paramID)) + "\"\u0060"
-	params.parameters = append(params.parameters, tmp)
-	println(tmp)
 }
 
 type UnhandledPktDumper struct {
@@ -50,6 +43,11 @@ func NewUnhandledPktDumper() *UnhandledPktDumper {
 	nDumper.loadDumpedPacketOpcodesFromFile()
 
 	return &nDumper
+}
+
+func (params *UPDstringParams) AddParam(paramID uint8, paramType string) {
+	var tmp string = "Unknown" + strconv.Itoa(int(paramID)) + " " + paramType + "\t\u0060mapstructure:\"" + strconv.Itoa(int(paramID)) + "\"\u0060"
+	params.parameters = append(params.parameters, tmp)
 }
 
 func (dumper *UnhandledPktDumper) loadDumpedPacketOpcodesFromFile() {
@@ -113,15 +111,15 @@ func (dumper *UnhandledPktDumper) extractPackets(data *string) (*packetDumpStora
 		if e != nil {
 			return nil, e
 		}
-		pss.PacketStrings = append(pss.PacketStrings, *pdc)
+		pss.DumpContainers = append(pss.DumpContainers, *pdc)
 	}
 
 	return &pss, nil
 }
 
-func (dumper *UnhandledPktDumper) DumpExists(opcode int16) (bool) {
-	for _, element := range dumper.DumpedPackets.PacketStrings {
-		if (element.Opcode == opcode) {
+func (dumper *UnhandledPktDumper) dumpExists(opcode int16) (bool) {
+	for _, element := range dumper.DumpedPackets.DumpContainers {
+		if element.Opcode == opcode {
 			return  true
 		}
 	}
@@ -129,6 +127,30 @@ func (dumper *UnhandledPktDumper) DumpExists(opcode int16) (bool) {
 	return false
 }
 
-func (dumper *UnhandledPktDumper) AddPacket(params *UPDstringParams) (*packetDumpStorage, error) {
-	return nil, nil
+func (dumper *UnhandledPktDumper) AddPacket(params *UPDstringParams) () {
+	if dumper.dumpExists(params.Opcode) {
+		return
+	}
+
+	var structHeader string = "\n" + pktStart + "\n" + pktStartOpcode + strconv.Itoa(int(params.Opcode)) + "\n"
+	var structBody string = "type " + OpcodeEnum[params.Opcode] + " struct {\n"
+	for _, e := range params.parameters {
+		structBody += e + "\n"
+	}
+	structBody += "}"
+
+	data := packetDumpContainer{Opcode:params.Opcode, DumpString:structBody}
+	dumper.DumpedPackets.DumpContainers = append(dumper.DumpedPackets.DumpContainers, data)
+
+	f, err := os.OpenFile(dumpFileName, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = f.WriteString(structHeader + structBody)
+	if err != nil {
+		panic(err)
+	}
+
+	f.Close()
 }
