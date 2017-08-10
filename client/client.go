@@ -22,8 +22,6 @@ func (client *Client) Run() {
 		proccessOfflinePcap(config.GlobalConfiguration.OfflinePath)
 	} else {
 		pw := newProcessWatcher()
-		go pw.run()
+		pw.run()
 	}
-
-	blockForever()
 }

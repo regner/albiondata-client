@@ -20,6 +20,11 @@ func decode(params map[string]interface{}, dumperParam *dumper.UPDstringParams) 
 		mapstructure.Decode(params, &operation)
 
 		return operation
+	case 10:
+		operation := operations.GetGameServerByCluster{}
+		mapstructure.Decode(params, &operation)
+
+		return operation
 	default:
 		if config.GlobalConfiguration.DumpUnknown == true {
 			dumper.UnhandledPacketDumper.AddPacket(dumperParam)
