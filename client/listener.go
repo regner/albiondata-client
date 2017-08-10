@@ -72,8 +72,8 @@ func (l *listener) processPacket(packet gopacket.Packet) {
 
 func (l *listener) onReliableCommand(command *photon.PhotonCommand) {
 	msg, _ := command.ReliableMessage()
-	params, _ := photon.DecodeReliableMessage(msg)
-	operation := decode(params)
+	params, _, dumperPar := photon.DecodeReliableMessage(msg)
+	operation := decode(params, dumperPar)
 
 	if operation != nil {
 		l.router.newOperation <- operation

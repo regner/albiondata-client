@@ -1,4 +1,4 @@
-package client
+package config
 
 type Config struct {
 	IngestUrl     string
@@ -6,6 +6,7 @@ type Config struct {
 	SaveLocally   bool
 	OfflinePath   string
 	Offline       bool
+	DumpUnknown		bool
 }
 
 var GlobalConfiguration = &Config{}
