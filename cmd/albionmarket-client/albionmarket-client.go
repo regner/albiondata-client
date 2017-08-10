@@ -2,12 +2,12 @@ package main
 
 import (
 	"flag"
-
 	"github.com/regner/albionmarket-client/client"
+	"github.com/regner/albionmarket-client/config"
 )
 
 var (
-	options = client.GlobalConfiguration
+	options = config.GlobalConfiguration
 )
 
 func init() {
@@ -37,6 +37,13 @@ func init() {
 		"o",
 		"",
 		"Parses a local file instead of checking albion ports",
+	)
+
+	flag.BoolVar(
+		&options.DumpUnknown,
+		"u",
+		false,
+		"If specified all unknown packets get stored locally inside the pktDump.go file.",
 	)
 }
 
