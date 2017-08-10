@@ -4,6 +4,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/regner/albionmarket-client/dumper"
 	"github.com/regner/albionmarket-client/config"
+	"github.com/regner/albionmarket-client/client/operations"
 )
 
 func decode(params map[string]interface{}, dumperParam *dumper.UPDstringParams) operation {
@@ -15,7 +16,7 @@ func decode(params map[string]interface{}, dumperParam *dumper.UPDstringParams) 
 
 	switch code {
 	case 67:
-		operation := requestBuyOrders{}
+		operation := operations.RequestBuyOrders{}
 		mapstructure.Decode(params, &operation)
 
 		return operation
