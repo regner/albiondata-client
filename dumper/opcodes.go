@@ -1,4 +1,4 @@
-package utils
+package dumper
 
 var OpcodeEnum = [...]string{
 	"Unused", //0  	(0x0  )

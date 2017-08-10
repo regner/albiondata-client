@@ -2,10 +2,11 @@ package client
 
 import (
 	"github.com/mitchellh/mapstructure"
-	"github.com/regner/albionmarket-client/utils"
+	"github.com/regner/albionmarket-client/dumper"
+	"github.com/regner/albionmarket-client/config"
 )
 
-func decode(params map[string]interface{}, dumperParam *utils.UPDstringParams) operation {
+func decode(params map[string]interface{}, dumperParam *dumper.UPDstringParams) operation {
 	if _, ok := params["253"]; !ok {
 		return nil
 	}
@@ -19,8 +20,9 @@ func decode(params map[string]interface{}, dumperParam *utils.UPDstringParams) o
 
 		return operation
 	default:
-		//TODO: Insert start param check to stop it from writing to file.
-		utils.UnhandledPacketDumper.AddPacket(dumperParam)
+		if config.GlobalConfiguration.DumpUnknown == true {
+			dumper.UnhandledPacketDumper.AddPacket(dumperParam)
+		}
 		return nil
 	}
 }

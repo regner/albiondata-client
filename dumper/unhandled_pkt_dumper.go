@@ -1,4 +1,4 @@
-package utils
+package dumper
 
 import (
 	"io/ioutil"
@@ -6,12 +6,13 @@ import (
 	"strings"
 	"strconv"
 	"os"
+	"github.com/regner/albionmarket-client/config"
 )
 
-var UnhandledPacketDumper UnhandledPktDumper = *NewUnhandledPktDumper()
+var UnhandledPacketDumper UnhandledPktDumper
 
 const dumpFileName string = "pktDump.go"
-const fileHeader string = `package main
+const fileHeader string = `package client
 
 `
 // Every packet has to have this
@@ -51,7 +52,9 @@ func (params *UPDstringParams) AddParam(paramID uint8, paramType string) {
 }
 
 func (dumper *UnhandledPktDumper) loadDumpedPacketOpcodesFromFile() {
-	//TODO: Insert start param check to stop it from reading/writing to file.
+	if config.GlobalConfiguration.DumpUnknown == false {
+		return
+	}
 	// try to open dumpfile
 	data, err := ioutil.ReadFile(dumpFileName)
 	if err != nil { // we failed, the file did not exist, so create it
