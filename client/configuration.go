@@ -8,3 +8,5 @@ type Config struct {
 	Offline       bool
 	DumpUnknown		bool
 }
+
+var GlobalConfiguration = &Config{}
