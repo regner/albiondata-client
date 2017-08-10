@@ -2,10 +2,12 @@ package client
 
 import (
 	"github.com/mitchellh/mapstructure"
+	"github.com/regner/albionmarket-client/dumper"
+	"github.com/regner/albionmarket-client/config"
 	"github.com/regner/albionmarket-client/client/operations"
 )
 
-func decode(params map[string]interface{}) operation {
+func decode(params map[string]interface{}, dumperParam *dumper.UPDstringParams) operation {
 	if _, ok := params["253"]; !ok {
 		return nil
 	}
@@ -19,6 +21,9 @@ func decode(params map[string]interface{}) operation {
 
 		return operation
 	default:
+		if config.GlobalConfiguration.DumpUnknown == true {
+			dumper.UnhandledPacketDumper.AddPacket(dumperParam)
+		}
 		return nil
 	}
 }
