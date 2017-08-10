@@ -1,13 +1,11 @@
-hash: 9dd05dc2f1c7ea9ec598e08a1a1f484e726e559bb02c012ffb601711b4100482
-updated: 2017-08-08T12:16:43.3469604-07:00
+hash: c7f4ff50054a013c3f3fab52abdfddcaa4873ce27d13007c7b6c4fe58f4fedaa
+updated: 2017-08-10T21:20:39.5576681+02:00
 imports:
 - name: github.com/google/gopacket
   version: 8af772c0bcc826f671fd7c133917fec9686d720d
   subpackages:
   - layers
   - pcap
-- name: github.com/hmadison/photon_spectator
-  version: 73b24beeae720ceaeb737b6e17b6dc966d0c9e1d
 - name: github.com/mitchellh/go-ps
   version: 4fdf99ab29366514c69ccccddab5dc58b8d84062
 - name: github.com/mitchellh/mapstructure
@@ -19,6 +17,8 @@ imports:
   subpackages:
   - internal/common
   - net
+- name: github.com/Ultraporing/photon_spectator
+  version: 2ccb1e3cde4430cf9643082e54af1b73a2c7b6c4
 - name: golang.org/x/sys
   version: d8f5ea21b9295e315e612b4bcf4bedea93454d4d
   subpackages:

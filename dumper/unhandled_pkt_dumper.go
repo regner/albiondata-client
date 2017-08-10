@@ -7,12 +7,13 @@ import (
 	"strconv"
 	"os"
 	"github.com/regner/albionmarket-client/config"
+	"log"
 )
 
 var UnhandledPacketDumper UnhandledPktDumper
 
 const dumpFileName string = "pktDump.go"
-const fileHeader string = `package client
+const fileHeader string = `package operations
 
 `
 // Every packet has to have this
@@ -42,6 +43,10 @@ type UnhandledPktDumper struct {
 func NewUnhandledPktDumper() *UnhandledPktDumper {
 	nDumper := UnhandledPktDumper{}
 	nDumper.loadDumpedPacketOpcodesFromFile()
+
+	if config.GlobalConfiguration.DumpUnknown == true {
+		log.Printf("Activated unknown packet dumper...")
+	}
 
 	return &nDumper
 }
