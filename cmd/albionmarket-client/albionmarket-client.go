@@ -2,12 +2,12 @@ package main
 
 import (
 	"flag"
-
+	"github.com/regner/albionmarket-client/config"
 	"github.com/regner/albionmarket-client/client"
 )
 
 var (
-	options = client.GlobalConfiguration
+	options = config.GlobalConfiguration
 )
 
 func init() {
