@@ -1,12 +1,12 @@
 package client
 
 import (
-	"log"
+	"github.com/regner/albionmarket-client/log"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
-	photon "github.com/ultraporing/photon_spectator"
+	photon "github.com/hmadison/photon_spectator"
 )
 
 func proccessOfflinePcap(path string) {

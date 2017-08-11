@@ -6,7 +6,10 @@ type Config struct {
 	SaveLocally   bool
 	OfflinePath   string
 	Offline       bool
-	DumpUnknown		bool
+	Debug         bool
+	LogLevel      string
 }
 
-var GlobalConfiguration = &Config{}
+var GlobalConfiguration = &Config{
+	LogLevel: "ERROR",
+}

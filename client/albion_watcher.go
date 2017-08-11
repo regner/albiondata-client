@@ -1,10 +1,10 @@
 package client
 
 import (
-	"log"
 	"time"
 
 	"github.com/google/gopacket/pcap"
+	"github.com/regner/albionmarket-client/log"
 )
 
 type albionProcessWatcher struct {
@@ -35,7 +35,7 @@ func (apw *albionProcessWatcher) run() {
 			return
 		default:
 			apw.updateListeners()
-			time.Sleep(time.Millisecond * 10)
+			time.Sleep(time.Second)
 		}
 	}
 }
@@ -93,10 +93,10 @@ func getDevices() []pcap.Interface {
 		id1 := -1
 		for id2, device := range devices {
 			if device.Name == bl {
-					found = true
-					id1 = id2
-					break
-				}
+				found = true
+				id1 = id2
+				break
+			}
 		}
 		if found {
 			devices = append(devices[:id1], devices[id1+1:]...)

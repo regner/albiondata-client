@@ -2,12 +2,12 @@ package client
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
-	photon "github.com/ultraporing/photon_spectator"
+	photon "github.com/hmadison/photon_spectator"
+	"github.com/regner/albionmarket-client/log"
 )
 
 type listener struct {
@@ -45,8 +45,6 @@ func (l *listener) run() {
 }
 
 func (l *listener) processPacket(packet gopacket.Packet) {
-	//log.Print("Processing a packet...")
-
 	layer := packet.Layer(photon.PhotonLayerType)
 
 	if layer == nil {
@@ -71,11 +69,21 @@ func (l *listener) processPacket(packet gopacket.Packet) {
 
 func (l *listener) onReliableCommand(command *photon.PhotonCommand) {
 	msg, _ := command.ReliableMessage()
-	params, _, dumperPar := photon.DecodeReliableMessage(msg)
-	operation := decode(params, dumperPar)
+	params, _ := photon.DecodeReliableMessage(msg)
 
-	if operation != nil {
-		l.router.newOperation <- operation
+	switch msg.Type {
+	case photon.OperationRequest:
+		operation := decodeRequest(params)
+
+		if operation != nil {
+			l.router.newOperation <- operation
+		}
+	case photon.OperationResponse:
+		operation := decodeResponse(params)
+
+		if operation != nil {
+			l.router.newOperation <- operation
+		}
 	}
 }
 
