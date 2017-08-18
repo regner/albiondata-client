@@ -1,9 +1,9 @@
 package client
 
 import (
-	ps "github.com/mitchellh/go-ps"
-	"github.com/shirou/gopsutil/net"
+	"github.com/mitchellh/go-ps"
 	"golang.org/x/tools/container/intsets"
+	"github.com/shirou/gopsutil"
 )
 
 func findProcess(processName string) []int {
