@@ -2,8 +2,8 @@ package client
 
 import (
 	"github.com/mitchellh/go-ps"
-	"golang.org/x/tools/container/intsets"
 	"github.com/shirou/gopsutil"
+	"golang.org/x/tools/container/intsets"
 )
 
 func getProcessPorts(pid int) []int {
