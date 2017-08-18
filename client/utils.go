@@ -1,10 +1,28 @@
 package client
 
 import (
-	ps "github.com/mitchellh/go-ps"
-	"github.com/shirou/gopsutil/net"
+	"github.com/mitchellh/go-ps"
 	"golang.org/x/tools/container/intsets"
 )
+
+func removeDuplicates(elements []int) []int {
+	// Use map to record duplicates as we find them.
+	encountered := map[int]bool{}
+	result := []int{}
+
+	for v := range elements {
+		if encountered[elements[v]] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[elements[v]] = true
+			// Append to result slice.
+			result = append(result, elements[v])
+		}
+	}
+	// Return the new slice.
+	return result
+}
 
 func findProcess(processName string) []int {
 	var results []int
@@ -17,18 +35,6 @@ func findProcess(processName string) []int {
 	}
 
 	return results
-}
-
-func getProcessPorts(pid int) []int {
-	var connections, _ = net.ConnectionsPid("all", int32(pid))
-	var result = make([]int, len(connections))
-
-	for i, c := range connections {
-		result[i] = int(c.Laddr.Port)
-	}
-
-	return result
-
 }
 
 func diffIntSets(a []int, b []int) ([]int, []int) {
