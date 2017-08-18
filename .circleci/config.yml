@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     working_directory: /go/src/github.com/regner/albionmarket-client
     docker:
       - image: circleci/golang:1.8
@@ -8,3 +8,88 @@ jobs:
       - checkout
       - run: go get golang.org/x/tools/cmd/goimports
       - run: make validate-fmt
+  build_windows:
+    working_directory: /go/src/github.com/regner/albionmarket-client
+    docker:
+      - image: regner/golang
+    steps:
+      - checkout
+      - run: make build-windows
+      - store_artifacts:
+          path: /go/src/github.com/regner/albionmarket-client/update-windows-amd64.exe.gz
+      - persist_to_workspace:
+          root: /go/src/github.com/regner/albionmarket-client
+          paths:
+            - update-windows-amd64.exe.gz
+  build_linux:
+    working_directory: /go/src/github.com/regner/albionmarket-client
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - checkout
+      - run: make build-linux
+      - store_artifacts:
+          path: /go/src/github.com/regner/albionmarket-client/update-linux-amd64.gz
+      - persist_to_workspace:
+          root: /go/src/github.com/regner/albionmarket-client
+          paths:
+            - update-linux-amd64.gz
+  build_darwin:
+    working_directory: /go/src/github.com/regner/albionmarket-client
+    docker:
+      - image: pcdummy/crossbuild-golang:1.8.3
+    steps:
+      - checkout
+      - run: make build-darwin
+      - store_artifacts:
+          path: /go/src/github.com/regner/albionmarket-client/update-darwin-amd64.gz
+      - persist_to_workspace:
+          root: /go/src/github.com/regner/albionmarket-client
+          paths:
+            - update-darwin-amd64.gz
+  deploy:
+    working_directory: /tmp/workspace
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: go get github.com/tcnksm/ghr
+      - run: ghr -t $GITHUB_TOKEN -u regner -r albionmarket-client $CIRCLE_TAG /tmp/workspace
+workflows:
+  version: 2
+  test_build_release:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.*/
+      - build_windows:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+      - build_linux:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+      - build_darwin:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+      - deploy:
+          requires:
+            - build_windows
+            - build_linux
+            - build_darwin
+          filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+

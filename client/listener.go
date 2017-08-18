@@ -11,37 +11,84 @@ import (
 )
 
 type listener struct {
-	source    *gopacket.PacketSource
-	fragments *photon.FragmentBuffer
-	quit      chan bool
-	router    *Router
+	handle      *pcap.Handle
+	source      *gopacket.PacketSource
+	displayName string
+	fragments   *photon.FragmentBuffer
+	quit        chan bool
+	router      *Router
 }
 
-func newListener(source *gopacket.PacketSource, router *Router) *listener {
+func newListener(router *Router) *listener {
 	return &listener{
-		source:    source,
 		fragments: photon.NewFragmentBuffer(),
-		quit:      make(chan bool),
+		quit:      make(chan bool, 1),
 		router:    router,
 	}
 }
 
+func (l *listener) startOnline(device string, port int) {
+	handle, err := pcap.OpenLive(device, 2048, false, pcap.BlockForever)
+	if err != nil {
+		log.Fatal(err)
+	}
+	l.handle = handle
+
+	err = l.handle.SetBPFFilter(fmt.Sprintf("tcp port %d || udp port %d", port, port))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	layers.RegisterUDPPortLayerType(layers.UDPPort(port), photon.PhotonLayerType)
+	layers.RegisterTCPPortLayerType(layers.TCPPort(port), photon.PhotonLayerType)
+	l.source = gopacket.NewPacketSource(l.handle, l.handle.LinkType())
+
+	l.displayName = fmt.Sprintf("online: %s:%d", device, port)
+	l.run()
+}
+
+func (l *listener) startOffline(path string) {
+	handle, err := pcap.OpenOffline(path)
+	if err != err {
+		log.Fatalf("Problem creating offline source. Error: %v", err)
+	}
+	l.handle = handle
+
+	for _, port := range []int{5055, 5056} {
+		layers.RegisterUDPPortLayerType(layers.UDPPort(port), photon.PhotonLayerType)
+		layers.RegisterTCPPortLayerType(layers.TCPPort(port), photon.PhotonLayerType)
+	}
+	l.source = gopacket.NewPacketSource(handle, handle.LinkType())
+
+	l.displayName = fmt.Sprintf("offline: %s", path)
+	l.run()
+}
+
 func (l *listener) run() {
-	log.Printf("Starting listener...")
+	log.Debugf("Starting listener (%s)...", l.displayName)
 
 	for {
 		select {
 		case <-l.quit:
-			log.Printf("Listener shutting down...")
+			log.Debugf("Listener shutting down (%s)...", l.displayName)
+			l.handle.Close()
 
 			return
 		case packet := <-l.source.Packets():
-			// Why can a packet be nil!?
 			if packet != nil {
 				l.processPacket(packet)
+			} else {
+				// MUST only happen with the offline processor.
+				l.handle.Close()
+				return
 			}
 		}
 	}
+}
+
+func (l *listener) stop() {
+	l.quit <- true
+	l.handle.Close()
 }
 
 func (l *listener) processPacket(packet gopacket.Packet) {
@@ -84,21 +131,6 @@ func (l *listener) onReliableCommand(command *photon.PhotonCommand) {
 		if operation != nil {
 			l.router.newOperation <- operation
 		}
+	case photon.EventDataType:
 	}
-}
-
-func createOnlineSource(device string, port int) *gopacket.PacketSource {
-	handle, err := pcap.OpenLive(device, 2048, false, pcap.BlockForever)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = handle.SetBPFFilter(fmt.Sprintf("tcp port %d || udp port %d", port, port))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	layers.RegisterUDPPortLayerType(layers.UDPPort(port), photon.PhotonLayerType)
-	layers.RegisterTCPPortLayerType(layers.TCPPort(port), photon.PhotonLayerType)
-	return gopacket.NewPacketSource(handle, handle.LinkType())
 }

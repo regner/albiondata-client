@@ -2,7 +2,6 @@ package client
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/regner/albionmarket-client/client/config"
 	"github.com/regner/albionmarket-client/log"
 )
 
@@ -15,12 +14,11 @@ func NewClient() *Client {
 
 func (client *Client) Run() {
 	log.SetFormatter(&logrus.TextFormatter{FullTimestamp: true, DisableSorting: true})
-	log.SetLevel(logrus.InfoLevel)
 
 	log.Info("Starting the Albion Market Client...")
 
-	if config.GlobalConfiguration.Offline {
-		proccessOfflinePcap(config.GlobalConfiguration.OfflinePath)
+	if ConfigGlobal.Offline {
+		processOfflinePcap(ConfigGlobal.OfflinePath)
 	} else {
 		pw := newProcessWatcher()
 		pw.run()
