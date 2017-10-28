@@ -19,7 +19,7 @@ func decodeRequest(params map[string]interface{}) (operation operation, err erro
 	switch code {
 	case 10:
 		operation = &operationGetGameServerByCluster{}
-	case 67:
+	case 69:
 		operation = &operationAuctionGetOffers{}
 	case 166:
 		operation = &operationGetClusterMapInfo{}
@@ -48,7 +48,7 @@ func decodeResponse(params map[string]interface{}) (operation operation, err err
 	switch code {
 	case 2:
 		operation = &operationJoinResponse{}
-	case 67:
+	case 69:
 		operation = &operationAuctionGetOffersResponse{}
 	case 68:
 		operation = &operationAuctionGetRequestsResponse{}
