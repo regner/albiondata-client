@@ -1,3 +1,6 @@
+# NOT MAINTAINED ANYMORE
+For a fork still being developed, see here: https://github.com/broderickhyman/albiondata-client
+
 [![CircleCI](https://circleci.com/gh/Regner/albiondata-client.svg?style=svg)](https://circleci.com/gh/Regner/albiondata-client) [![Go Report Card](https://goreportcard.com/badge/github.com/Regner/albiondata-client)](https://goreportcard.com/report/github.com/Regner/albiondata-client)
 
 # Albion Data - Client
